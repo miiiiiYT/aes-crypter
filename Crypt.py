@@ -1,8 +1,7 @@
-try:
-    from Crypto.Cipher import AES
-    import hashlib
-except ImportError:
-    print('Please install PyCryptodome')
+
+from Crypto.Cipher import AES
+import hashlib
+
 
 class Unverified(Exception):
     pass
@@ -20,7 +19,7 @@ def encrypt(password, message):
         out = dict()
         ci = AES.new(key, AES.MODE_EAX)
         nonce = ci.nonce
-        citext, tag = ci.encrypt_and_digest(message.encode())
+        citext, tag = ci.encrypt_and_digest(messec)
         out['key'] = key
         out['ciphertext'] = citext
         out['tag'] = tag
@@ -35,14 +34,20 @@ def decrypt(enc_dict):
     if isinstance(enc_dict, dict):
         try:
             ci = AES.new(enc_dict['key'], AES.MODE_EAX, nonce=enc_dict['nonce'])
-            ci.decrypt(enc_dict['ciphertext']
-            try:
-                ci.verify(enc_data['tag']
-            except ValueError:
-                raise Unverified('Key incorrect or message corrupted.')
-
-        except NameError:
-            raise NotProperlyDefined('Please use a dictionary with the keys \"key, tag, nonce, ciphertext\"'
+            plain = ci.decrypt(enc_dict['ciphertext'])
+            ci.verify(enc_dict['tag'])
+            return plain
+        except ValueError:
+            raise Unverified('Key incorrect or message corrupted.')
             
     else:
         raise(ValueError('Please use a dictionary as argument'))
+
+
+print('Encrypted Data:')
+enc = encrypt('1234', 'Uhu')
+print(enc)
+print('')
+
+print('Decrypted Data:\n')
+plain = decrypt(enc)
